@@ -15,7 +15,7 @@ namespace SP23.P01.Web.Models
                 dataContext.TrainStations.AddRange(
                     new TrainStation
                     {
-                        Id = 1,
+                      //  Id = 1,
                         Name = "Hammond",
                         Address = "404 NW Railroad Ave",
                     });

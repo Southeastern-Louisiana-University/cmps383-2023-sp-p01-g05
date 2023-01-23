@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SP23.P01.Web.Common;
+using System.Reflection.Metadata.Ecma335;
 
 namespace SP23.P01.Web.Controllers
 //{
@@ -48,10 +49,30 @@ namespace SP23.P01.Web.Controllers
         public IActionResult GetAll()
         {
             var response = new Response();
-             response.Data = _context.TrainStations.ToList();
+            response.Data = _context.TrainStations.ToList();
 
             return Ok(response);
         }
-    }
+        [HttpGet("{Id:int}")]
+        public IActionResult Details([FromRoute] int Id)
+        {
+            var response = new Response();
 
+            var trainStationReturn = _context.TrainStations.FirstOrDefault(x => x.Id == Id);
+
+            if (trainStationReturn == null)
+            {
+                return NotFound($"Unable to find Id {Id}");
+            }
+            if (response.HasErrors)
+            {
+                return BadRequest(response);
+            }
+
+            response.Data = trainStationReturn;
+
+            return Ok(response);
+
+        }
+    }
 }
