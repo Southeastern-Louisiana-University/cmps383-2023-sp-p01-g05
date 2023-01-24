@@ -35,7 +35,7 @@ namespace SP23.P01.Web.Controllers
 //}
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[[/api/stations]]")]
     public class TrainStationController : ControllerBase
     {
         private readonly DataContext _context;
@@ -45,11 +45,11 @@ namespace SP23.P01.Web.Controllers
             _context = context;
         }
 
-        [HttpGet("list-all")]
+        [HttpGet]
         public IActionResult GetAll()
         {
             var response = new Response();
-            response.Data = _context.TrainStations.ToList();
+            response.Data = _context.TrainStation.ToList();
 
             return Ok(response);
         }
@@ -58,7 +58,7 @@ namespace SP23.P01.Web.Controllers
         {
             var response = new Response();
 
-            var trainStationReturn = _context.TrainStations.FirstOrDefault(x => x.Id == Id);
+            var trainStationReturn = _context.TrainStation.FirstOrDefault(x => x.Id == Id);
 
             if (trainStationReturn == null)
             {
@@ -73,6 +73,44 @@ namespace SP23.P01.Web.Controllers
 
             return Ok(response);
 
+        }
+        [HttpPost]
+        public IActionResult Create(TrainStationDto trainStation)
+        {
+            var response = new Response();
+
+            if (string.IsNullOrEmpty(trainStation.Name))
+            {
+                return BadRequest("Name must be provided");
+            }
+            if (trainStation.Name.Length > 120)
+            {
+                return BadRequest("Name cannot be longer than 120 characters");
+            }
+            if (string.IsNullOrEmpty(trainStation.Address))
+            {
+                return BadRequest("Must have an address");
+            }
+            var station = new TrainStation
+            {
+                Name = trainStation.Name,
+                Address = trainStation.Address
+            };
+            // Save the new station to the database
+            _context.TrainStation.Add(station);
+            _context.SaveChanges();
+
+            var trainStationToReturn = new TrainStation
+            {
+                Id = station.Id,
+                Name = station.Name,
+                Address = station.Address,
+
+            };
+
+            response.Data = trainStationToReturn;
+
+            return Created("", response);
         }
     }
 }
