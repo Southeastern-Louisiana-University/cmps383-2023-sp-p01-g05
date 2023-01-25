@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SP23.P01.Web.Common;
-using System.Reflection.Metadata.Ecma335;
+using SP23.P01.Web.Entities;
+using System.Net;
 
 namespace SP23.P01.Web.Controllers
 //{
@@ -49,16 +52,21 @@ namespace SP23.P01.Web.Controllers
         public IActionResult GetAll()
         {
             var response = new Response();
-            response.Data = _context.TrainStation.ToList();
+
+            response.Data =  _context.TrainStations.ToList();
+            if(response.Data == null) 
+            { 
+                return NotFound();
+            }
 
             return Ok(response);
-        }
+        }  
         [HttpGet("{Id:int}")]
-        public IActionResult Details([FromRoute] int Id)
+        public ActionResult<TrainStationDto> Details([FromRoute] int Id)
         {
             var response = new Response();
 
-            var trainStationReturn = _context.TrainStation.FirstOrDefault(x => x.Id == Id);
+            var trainStationReturn = _context.TrainStations.FirstOrDefault(x => x.Id == Id);
 
             if (trainStationReturn == null)
             {
@@ -97,7 +105,7 @@ namespace SP23.P01.Web.Controllers
                 Address = trainStation.Address
             };
             // Save the new station to the database
-            _context.TrainStation.Add(station);
+            _context.TrainStations.Add(station);
             _context.SaveChanges();
 
             var trainStationToReturn = new TrainStation
@@ -111,6 +119,69 @@ namespace SP23.P01.Web.Controllers
             response.Data = trainStationToReturn;
 
             return Created("", response);
+        }
+        [HttpPut("{id}")]
+        public IActionResult Edit(int Id, [FromBody] TrainStationDto trainStationDto)
+        {
+            var response = new Response();
+
+            var stationToEdit = _context.TrainStations.Find(Id);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (trainStationDto == null)
+            {
+                response.AddError("ID", "Id Not Found");
+                return NotFound(response);
+            }
+            if (trainStationDto.Name == null || trainStationDto.Name.Length > 120)
+            {
+            response.AddError("Name", "Name must be provided or Name cannot be longer than 120 characters");
+            }
+            if(trainStationDto.Name == "")
+            {
+                response.AddError("Name", "No name provided");
+            }
+            if(trainStationDto.Address == null || trainStationDto.Address == "")
+            {
+                response.AddError("Address", "Must have an address");
+
+            }
+            if(response.HasErrors)
+            {
+                return BadRequest(response);
+            }
+
+            stationToEdit.Name = trainStationDto.Name;
+            stationToEdit.Address = trainStationDto.Address;
+
+            _context.SaveChanges();
+
+            response.Data = stationToEdit;
+
+            return Ok(response);
+        }
+        [HttpDelete]
+        [Route("{Id}")]
+        public IActionResult DeleteStation(int Id)
+        {
+
+            var response = new Response();
+
+            var station = _context.TrainStations.Find(Id);
+            if (station == null)
+            {
+                response.AddError("Id", "There was problem deleting a station");
+                return NotFound();
+            }
+            _context.TrainStations.Remove(station);
+            _context.SaveChanges();
+
+            response.Data = true;
+
+
+            return Ok(response);    
         }
     }
 }
