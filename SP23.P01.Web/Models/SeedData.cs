@@ -10,7 +10,7 @@ namespace SP23.P01.Web.Models
             await dataContext.Database.MigrateAsync();
 
             AddTrainStations(dataContext);
-            //add seeded func await AddNext();
+            //add seeded func await AddNextTable();
         }
         private static void AddTrainStations(DataContext dataContext)
         {

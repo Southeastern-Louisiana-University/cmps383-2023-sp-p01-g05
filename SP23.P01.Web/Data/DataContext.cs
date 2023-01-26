@@ -5,7 +5,7 @@ public class DataContext : DbContext
 {
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-    public DbSet<TrainStation> TrainStations { get; set; }//this might cause an issue
+    public DbSet<TrainStation> TrainStations { get; set; }//this might cause an issue.If remove this update the controller..
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -14,12 +14,3 @@ public class DataContext : DbContext
        
     }
 }
-
-//modelBuilder.ApplyConfiguration(new TrainStationConfiguration());
-
-//modelBuilder.Entity<trainsattion>()
-//.Property(t=>t.Name)
-//.IsRequired()
-//.HasMaxLength(120); ... modelBuilder or use Annotations [Required,MaxLength(120)]
-//another way..
-//public class TrainStation
