@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SP23.P01.Web.Models;
+using SP23.P01.Web.Models;//ctrl period  f12 go to deginition
 
 var builder = WebApplication.CreateBuilder(args);
 
